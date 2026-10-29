@@ -2,11 +2,15 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\LogoutResponse;
 use Carbon\CarbonImmutable;
+use Filament\Http\Responses\Auth\Contracts\LogoutResponse as LogoutResponseContract;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rules\Password;
+use SocialiteProviders\Discord\DiscordExtendSocialite;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(LogoutResponseContract::class, LogoutResponse::class);
     }
 
     /**
@@ -24,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Event::listen(SocialiteWasCalled::class, [DiscordExtendSocialite::class, 'handle']);
     }
 
     /**
@@ -35,16 +41,6 @@ class AppServiceProvider extends ServiceProvider
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
-        );
-
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
         );
     }
 }
