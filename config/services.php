@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'discord' => [
+        'client_id' => env('DISCORD_CLIENT_ID'),
+        'client_secret' => env('DISCORD_CLIENT_SECRET'),
+        'redirect' => env('DISCORD_REDIRECT_URI', '/auth/discord/callback'),
+        // Comptes qui reçoivent les rôles Admin + DRH à leur première connexion.
+        'admin_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('ADMIN_DISCORD_IDS', ''))))),
+        'webhooks' => [
+            'direction' => env('DISCORD_WEBHOOK_DIRECTION'),
+            'hr' => env('DISCORD_WEBHOOK_DRH'),
+            'sectors' => env('DISCORD_WEBHOOK_SECTORS'),
+            // Salon où les candidats peuvent être mentionnés (<@id>). Par défaut : aucun.
+            'candidates' => env('DISCORD_WEBHOOK_CANDIDATES'),
+        ],
+    ],
 ];
